@@ -3,9 +3,9 @@ name: ci
 on:
   push:
     branches:
-      - main
+      - master
   schedule:
-    - cron: "* * * * *"
+    - cron: '0 0/8 * * *'
 
 jobs:
   autogreen:
@@ -14,11 +14,11 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v2
 
-      - name: AutoGreen
+      - name: Auto green
         run: |
-          git config --local user.email "945981976@qq.com"
-          git config --local user.name "Zirong.Liu"
+          git config --local user.email "zeemenng@gmail.com"
+          git config --local user.name "Zee"
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git pull --rebase
-          git commit --allow-empty -m "a commit a day keeps your girlfriend away"
+          git commit --allow-empty -m "自动点绿"
           git push
