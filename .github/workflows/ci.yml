@@ -1,24 +1,55 @@
 name: ci
 
 on:
-  push:
-    branches:
-      - main
   schedule:
-    - cron: '* * * * *'
+    - cron: '0 0 * * *' # 每天的UTC时间00:00触发
 
 jobs:
   autogreen:
     runs-on: ubuntu-latest
+
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
 
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip
+
       - name: Auto green
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --local user.email "945981976@qq.com"
-          git config --local user.name "ZirongLiu"
-          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git pull --rebase
-          git commit --allow-empty -m "updata"
-          git push
+          python - <<EOF
+          import os
+          import random
+          import time
+          from datetime import datetime
+
+          # 获取随机次数
+          num_commits = random.randint(1, 10)
+
+          for _ in range(num_commits):
+              # 设置Git配置
+              os.system('git config --local user.email "945981976@qq.com"')
+              os.system('git config --local user.name "ZirongLiu"')
+              
+              # 提交空提交
+              os.system('git commit --allow-empty -m "updata"')
+              
+              # 等待一段时间，确保提交时间有间隔
+              time.sleep(random.randint(10, 600)) # 随机等待10秒到10分钟
+
+          # 更新远程仓库URL
+          os.system('git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}')
+          
+          # 拉取最新代码并进行rebase
+          os.system('git pull --rebase')
+          
+          # 推送更改到远程仓库
+          os.system('git push')
+          EOF
